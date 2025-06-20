@@ -21,18 +21,12 @@ set -ex
 # bash build-image.sh ${CANN_VERSION}
 
 CANN_VERSION=${1:-8.0.0} # default 8.0.0
-SYSTEM=${2:-x86_64} # default x86_64
+SYSTEM=${2:-$(uname -m)} # default uname -m
 NPU_VERSION=${3:-910b} # default 910b
 
-DOCKER_VERSION=${CANN_VERSION//[^0-9A-Z]/} # 80T13
+DOCKER_VERSION=${CANN_VERSION//[^0-9A-Z]/} # 800
 
-# Download packages from https://www.hiascend.com/software/cann/community first
-if [ ! -f Ascend-cann-toolkit_${CANN_VERSION}_linux-$(uname -m).run ]; then
-  echo "Please download CANN installation packages first!"
-  exit 1
-fi
-
-sed "s#<baseimg>#registry.baidubce.com/device/paddle-cpu:ubuntu20-npu-base-$(uname -m)-gcc84#g" Dockerfile.npu.ubuntu20.gcc84 > Dockerfile.npu.ubuntu20.gcc84.test
+sed "s#<baseimg>#ccr-2vdh3abv-pub.cnc.bj.baidubce.com/device/paddle-cpu:ubuntu20-npu-base-$(uname -m)-gcc84#g" Dockerfile.npu.ubuntu20.gcc84 > Dockerfile.npu.ubuntu20.gcc84.test
 #docker pull registry.baidubce.com/device/paddle-cpu:ubuntu20-npu-base-$(uname -m)-gcc84
 docker build --network=host -f Dockerfile.npu.ubuntu20.gcc84.test \
   --build-arg CANN_VERSION=${CANN_VERSION} \
